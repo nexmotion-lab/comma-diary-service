@@ -5,15 +5,16 @@ import lombok.Data;
 
 @Entity
 @Data
+@IdClass(DiaryPerEventTagId.class)
 @Table(name = "diary_per_event_tag")
 public class DiaryPerEventTag {
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diaryNo")
     private Diary diary;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eventTagNo")
     private EventTag eventTag;
 }

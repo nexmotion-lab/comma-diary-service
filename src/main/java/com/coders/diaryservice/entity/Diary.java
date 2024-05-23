@@ -16,6 +16,7 @@ public class Diary {
 
     private int accountId;
     private String content;
+    private String coreEmotionTag;
     private LocalDateTime dateCreated;
 
     @OneToMany(mappedBy = "diary")

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DiaryPerEmotionTagService {
@@ -14,20 +15,22 @@ public class DiaryPerEmotionTagService {
     @Autowired
     private DiaryPerEmotionTagRepository repository;
 
-    public DiaryPerEmotionTag save(DiaryPerEmotionTag diaryPerEmotionTag) {
-        return repository.save(diaryPerEmotionTag);
-    }
-
     public List<DiaryPerEmotionTag> findAll() {
         return repository.findAll();
     }
 
+    public Optional<DiaryPerEmotionTag> findById(DiaryPerEmotionTagId id) {
+        return repository.findById(id);
+    }
+
+    public DiaryPerEmotionTag save(DiaryPerEmotionTag diaryPerEmotionTag) {
+        return repository.save(diaryPerEmotionTag);
+    }
+
+    public void deleteById(DiaryPerEmotionTagId id) {
+        repository.deleteById(id);
+    }
     public List<DiaryPerEmotionTag> findByDiaryNo(int diaryNo) {
         return repository.findByDiaryNo(diaryNo);
     }
-
-    public void delete(DiaryPerEmotionTagId id) {
-        repository.deleteById(id);
-    }
 }
-

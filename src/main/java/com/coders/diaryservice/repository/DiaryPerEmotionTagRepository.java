@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface DiaryPerEmotionTagRepository extends JpaRepository<DiaryPerEmotionTag, DiaryPerEmotionTagId> {
     List<DiaryPerEmotionTag> findByDiaryNo(int diaryNo);
-
 }

@@ -1,5 +1,6 @@
 package com.coders.diaryservice.controller;
 
+import com.coders.diaryservice.DTO.DiaryRequest;
 import com.coders.diaryservice.entity.Diary;
 import com.coders.diaryservice.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -36,10 +38,13 @@ public class DiaryController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Tag(name = "Diary API")
-    @Operation(summary = "감정일기 생성", description = "감정일기를 생성합니다.")
     @PostMapping
-    public ResponseEntity<Diary> createDiary(Diary diary) {
-        return ResponseEntity.ok(diaryService.saveDiary(diary));
+    public Diary createDiary(@RequestBody DiaryRequest diaryRequest) {
+        Diary diary = new Diary();
+        diary.setContent(diaryRequest.getContent());
+        diary.setCoreEmotionTag(diaryRequest.getCoreEmotionTag());
+        diary.setDateCreated(new Date());
+
+        return diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
     }
 }
