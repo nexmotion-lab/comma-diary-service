@@ -1,28 +1,33 @@
 package com.coders.diaryservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import static jakarta.persistence.FetchType.LAZY;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "diary_per_emotion_tag")
-@IdClass(DiaryPerEmotionTagId.class)
 public class DiaryPerEmotionTag {
-    @Id
-    private int diaryNo;
+    @EmbeddedId
+    private DiaryPerEmotionTagId id;
 
-    @Id
-    private int emotionTagNo;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "diaryNo", insertable = false, updatable = false)
-    @JsonIgnore
+    @ManyToOne
+    @MapsId("diaryNo")
+    @JoinColumn(name = "diary_no")
     private Diary diary;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "emotionTagNo", insertable = false, updatable = false)
-    @JsonIgnore
+    @ManyToOne
+    @MapsId("emotionTagNo")
+    @JoinColumn(name = "emotion_tag_no")
     private EmotionTag emotionTag;
+
+    // 기본 생성자
+    public DiaryPerEmotionTag() {}
+
+    public DiaryPerEmotionTag(DiaryPerEmotionTagId id, Diary diary, EmotionTag emotionTag) {
+        this.id = id;
+        this.diary = diary;
+        this.emotionTag = emotionTag;
+    }
 }

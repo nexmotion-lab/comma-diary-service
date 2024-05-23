@@ -1,17 +1,20 @@
 package com.coders.diaryservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "emotion_tag")
 public class EmotionTag {
     @Id
-    private int emotion_tag_no;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long emotionTagNo;
     private String name;
-    private int x_Value;
-    private int y_Value;
+    private int xvalue;
+    private int yvalue;
+
+    // getters and setters
 }

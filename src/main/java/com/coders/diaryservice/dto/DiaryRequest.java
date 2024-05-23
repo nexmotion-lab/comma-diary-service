@@ -1,13 +1,17 @@
-package com.coders.diaryservice.DTO;
+package com.coders.diaryservice.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
+import lombok.NoArgsConstructor;
 import java.util.List;
 
+@Builder
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DiaryRequest {
+    private Long account_id;
     private String content;
     private String coreEmotionTag;
     private List<Long> eventTagIds;
@@ -15,3 +19,4 @@ public class DiaryRequest {
 
     // getters and setters
 }
+

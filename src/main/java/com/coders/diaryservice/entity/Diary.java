@@ -1,29 +1,28 @@
 package com.coders.diaryservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "diary")
 public class Diary {
-
     @Id
-    private int diaryNo;
-
-    private int accountId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long diaryNo;
+    private Long account_id;
     private String content;
     private String coreEmotionTag;
-    private LocalDateTime dateCreated;
+    private Date dateCreated;
 
-    @OneToMany(mappedBy = "diary")
-    @JsonIgnoreProperties("diary")  // 순환 참조 방지
-    private List<DiaryPerEventTag> diaryPerEventTags;
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
+    private List<DiaryPerEventTag> eventTags;
 
-    @OneToMany(mappedBy = "diary")
-    @JsonIgnoreProperties("diary")  // 순환 참조 방지
-    private List<DiaryPerEmotionTag> diaryPerEmotionTags;
+    @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
+    private List<DiaryPerEmotionTag> emotionTags;
 }
