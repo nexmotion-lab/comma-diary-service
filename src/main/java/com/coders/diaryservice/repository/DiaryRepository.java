@@ -1,7 +1,6 @@
 package com.coders.diaryservice.repository;
 
 import com.coders.diaryservice.entity.Diary;
-import com.coders.diaryservice.entity.EventTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
