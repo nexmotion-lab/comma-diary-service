@@ -27,6 +27,7 @@ public class DiaryService {
     @Autowired
     private DiaryPerEmotionTagRepository diaryPerEmotionTagRepository;
 
+    // 감정일기 생성
     @Transactional
     public Diary createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds) {
         // Save the diary
@@ -49,5 +50,10 @@ public class DiaryService {
         }
 
         return savedDiary;
+    }
+
+    // 감정일기 리스트 불러오기
+    public List<Diary> getDiariesByAccountId(Long account_id) {
+        return diaryRepository.findByAccountId(account_id);
     }
 }
