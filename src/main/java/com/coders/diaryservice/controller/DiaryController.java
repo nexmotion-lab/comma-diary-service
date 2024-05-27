@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/diary")
@@ -40,7 +41,6 @@ public class DiaryController {
         return diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
     }
 
-
     @GetMapping
     public List<Diary> getDiariesByAccountId(HttpServletRequest request) {
         String accountIdStr = request.getHeader("account_id");
@@ -49,5 +49,25 @@ public class DiaryController {
         }
         Long accountId = Long.parseLong(accountIdStr);
         return diaryService.getDiariesByAccountId(accountId);
+    }
+
+    @GetMapping("/{diaryNo}")
+    public Optional<Diary> getDiaryDetails(@PathVariable Long diaryNo, HttpServletRequest request) {
+        String accountIdStr = request.getHeader("account_id");
+        if (accountIdStr == null || accountIdStr.isEmpty()) {
+            throw new IllegalArgumentException("Missing account_id header");
+        }
+        Long accountId = Long.parseLong(accountIdStr);
+        return diaryService.getDiaryDetails(accountId, diaryNo);
+    }
+
+    @DeleteMapping("/{diaryNo}")
+    public void deleteDiary(@PathVariable Long diaryNo, HttpServletRequest request) {
+        String accountIdStr = request.getHeader("account_id");
+        if (accountIdStr == null || accountIdStr.isEmpty()) {
+            throw new IllegalArgumentException("Missing account_id header");
+        }
+        Long accountId = Long.parseLong(accountIdStr);
+        diaryService.deleteDiary(accountId, diaryNo);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DiaryService {
@@ -55,5 +56,16 @@ public class DiaryService {
     // 감정일기 리스트 불러오기
     public List<Diary> getDiariesByAccountId(Long account_id) {
         return diaryRepository.findByAccountId(account_id);
+    }
+    public void deleteDiary(Long accountId, Long diaryNo) {
+        Optional<Diary> diary = diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
+        if (diary.isPresent()) {
+            diaryRepository.delete(diary.get());
+        } else {
+            throw new IllegalArgumentException("Diary not found or you do not have permission to delete it");
+        }
+    }
+    public Optional<Diary> getDiaryDetails(Long accountId, Long diaryNo) {
+        return diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
     }
 }
