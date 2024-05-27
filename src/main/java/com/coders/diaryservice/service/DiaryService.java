@@ -2,7 +2,6 @@ package com.coders.diaryservice.service;
 
 import com.coders.diaryservice.entity.*;
 import com.coders.diaryservice.repository.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +27,10 @@ public class DiaryService {
     @Autowired
     private DiaryPerEmotionTagRepository diaryPerEmotionTagRepository;
 
-    // 감정일기 생성
     @Transactional
     public Diary createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds) {
-        // Save the diary
         Diary savedDiary = diaryRepository.save(diary);
 
-        // Add event tags
         for (Long eventTagId : eventTagIds) {
             EventTag eventTag = eventTagRepository.findById(eventTagId).orElseThrow(() -> new RuntimeException("EventTag not found"));
             DiaryPerEventTagId diaryPerEventTagId = new DiaryPerEventTagId(savedDiary.getDiaryNo(), eventTag.getEventTagNo());
@@ -42,7 +38,6 @@ public class DiaryService {
             diaryPerEventTagRepository.save(diaryPerEventTag);
         }
 
-        // Add emotion tags
         for (Long emotionTagId : emotionTagIds) {
             EmotionTag emotionTag = emotionTagRepository.findById(emotionTagId).orElseThrow(() -> new RuntimeException("EmotionTag not found"));
             DiaryPerEmotionTagId diaryPerEmotionTagId = new DiaryPerEmotionTagId(savedDiary.getDiaryNo(), emotionTag.getEmotionTagNo());
@@ -53,10 +48,10 @@ public class DiaryService {
         return savedDiary;
     }
 
-    // 감정일기 리스트 불러오기
     public List<Diary> getDiariesByAccountId(Long account_id) {
         return diaryRepository.findByAccountId(account_id);
     }
+
     public void deleteDiary(Long accountId, Long diaryNo) {
         Optional<Diary> diary = diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
         if (diary.isPresent()) {
@@ -65,7 +60,29 @@ public class DiaryService {
             throw new IllegalArgumentException("Diary not found or you do not have permission to delete it");
         }
     }
+
     public Optional<Diary> getDiaryDetails(Long accountId, Long diaryNo) {
         return diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
+    }
+
+    @Transactional
+    public void addEventToDiary(Long diaryNo, Long accountId, String eventName) {
+        Diary diary = diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Diary not found or account mismatch"));
+
+        EventTag eventTag = eventTagRepository.findByName(eventName);
+        if (eventTag == null) {
+            eventTag = new EventTag();
+            eventTag.setName(eventName);
+            eventTag = eventTagRepository.save(eventTag);
+        }
+
+        DiaryPerEventTagId diaryPerEventTagId = new DiaryPerEventTagId(diary.getDiaryNo(), eventTag.getEventTagNo());
+        DiaryPerEventTag diaryPerEventTag = new DiaryPerEventTag(diaryPerEventTagId, diary, eventTag);
+        diaryPerEventTagRepository.save(diaryPerEventTag);
+    }
+
+    public List<Object[]> getDistinctEventTagsByAccountId(Long accountId) {
+        return diaryPerEventTagRepository.findDistinctEventTagsByAccountId(accountId);
     }
 }
