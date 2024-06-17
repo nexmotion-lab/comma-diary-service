@@ -1,57 +1,54 @@
 package com.coders.diaryservice.service;
 
+import com.coders.diaryservice.dto.DiaryDto;
+import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.*;
 import com.coders.diaryservice.repository.*;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class DiaryService {
 
-    @Autowired
-    private DiaryRepository diaryRepository;
+    private final DiaryRepository diaryRepository;
 
-    @Autowired
-    private EventTagRepository eventTagRepository;
+    private final EventTagRepository eventTagRepository;
 
-    @Autowired
-    private EmotionTagRepository emotionTagRepository;
+    private final EmotionTagRepository emotionTagRepository;
 
-    @Autowired
-    private DiaryPerEventTagRepository diaryPerEventTagRepository;
+    private final DiaryPerEventTagRepository diaryPerEventTagRepository;
 
-    @Autowired
-    private DiaryPerEmotionTagRepository diaryPerEmotionTagRepository;
+    private final DiaryPerEmotionTagRepository diaryPerEmotionTagRepository;
+
+    private final EventTagDao eventTagDao;
+
+    private final EmotionTagDao emotionTagDao;
 
     @Transactional
-    public Diary createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds) {
+    public void createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds) {
         Diary savedDiary = diaryRepository.save(diary);
-
-        for (Long eventTagId : eventTagIds) {
-            EventTag eventTag = eventTagRepository.findById(eventTagId).orElseThrow(() -> new RuntimeException("EventTag not found"));
-            DiaryPerEventTagId diaryPerEventTagId = new DiaryPerEventTagId(savedDiary.getDiaryNo(), eventTag.getEventTagNo());
-            DiaryPerEventTag diaryPerEventTag = new DiaryPerEventTag(diaryPerEventTagId, savedDiary, eventTag);
-            diaryPerEventTagRepository.save(diaryPerEventTag);
-        }
-
-        for (Long emotionTagId : emotionTagIds) {
-            EmotionTag emotionTag = emotionTagRepository.findById(emotionTagId).orElseThrow(() -> new RuntimeException("EmotionTag not found"));
-            DiaryPerEmotionTagId diaryPerEmotionTagId = new DiaryPerEmotionTagId(savedDiary.getDiaryNo(), emotionTag.getEmotionTagNo());
-            DiaryPerEmotionTag diaryPerEmotionTag = new DiaryPerEmotionTag(diaryPerEmotionTagId, savedDiary, emotionTag);
-            diaryPerEmotionTagRepository.save(diaryPerEmotionTag);
-        }
-
-        return savedDiary;
+        eventTagDao.batchInsertEventTags(eventTagIds, savedDiary.getDiaryNo());
+        emotionTagDao.batchInsertEmotionTags(emotionTagIds, diary.getDiaryNo());
     }
 
-    public List<Diary> getDiariesByAccountId(Long account_id) {
-        return diaryRepository.findByAccountId(account_id);
+    public List<DiaryDto> getDiaries(Long lastNo, int size, Long accountId) {
+        Pageable pageable = Pageable.ofSize(size);
+        Page<Diary> diaryPage = diaryRepository.findByLastId(lastNo, pageable, accountId);
+        return diaryPage.stream()
+                .map(DiaryMapper::toDto)
+                .collect(Collectors.toList());
     }
-
     public void deleteDiary(Long accountId, Long diaryNo) {
         Optional<Diary> diary = diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
         if (diary.isPresent()) {
@@ -63,23 +60,6 @@ public class DiaryService {
 
     public Optional<Diary> getDiaryDetails(Long accountId, Long diaryNo) {
         return diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId);
-    }
-
-    @Transactional
-    public void addEventToDiary(Long diaryNo, Long accountId, String eventName) {
-        Diary diary = diaryRepository.findByDiaryNoAndAccountId(diaryNo, accountId)
-                .orElseThrow(() -> new IllegalArgumentException("Diary not found or account mismatch"));
-
-        EventTag eventTag = eventTagRepository.findByName(eventName);
-        if (eventTag == null) {
-            eventTag = new EventTag();
-            eventTag.setName(eventName);
-            eventTag = eventTagRepository.save(eventTag);
-        }
-
-        DiaryPerEventTagId diaryPerEventTagId = new DiaryPerEventTagId(diary.getDiaryNo(), eventTag.getEventTagNo());
-        DiaryPerEventTag diaryPerEventTag = new DiaryPerEventTag(diaryPerEventTagId, diary, eventTag);
-        diaryPerEventTagRepository.save(diaryPerEventTag);
     }
 
     public List<Object[]> getDistinctEventTagsByAccountId(Long accountId) {

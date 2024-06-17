@@ -1,34 +1,48 @@
 package com.coders.diaryservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
+
+import java.time.LocalDate;
 
 
 @Entity
 @Getter
 @Setter
 @Table(name = "diary_per_event_tag")
-public class DiaryPerEventTag {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+public class DiaryPerEventTag implements Persistable<DiaryPerEventTagId> {
+
     @EmbeddedId
     private DiaryPerEventTagId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("diaryNo")
     @JoinColumn(name = "diary_no")
     private Diary diary;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("eventTagNo")
     @JoinColumn(name = "event_tag_no")
     private EventTag eventTag;
 
-    // 기본 생성자
-    public DiaryPerEventTag() {}
+    @CreatedDate
+    @Transient
+    private LocalDate created;
 
-    public DiaryPerEventTag(DiaryPerEventTagId id, Diary diary, EventTag eventTag) {
-        this.id = id;
-        this.diary = diary;
-        this.eventTag = eventTag;
+
+
+    @Override
+    public DiaryPerEventTagId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return created == null;
     }
 }

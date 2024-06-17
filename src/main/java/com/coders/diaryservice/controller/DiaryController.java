@@ -1,10 +1,14 @@
 package com.coders.diaryservice.controller;
 
+import com.coders.diaryservice.dto.DiaryDto;
 import com.coders.diaryservice.dto.DiaryRequest;
 import com.coders.diaryservice.entity.Diary;
 import com.coders.diaryservice.service.DiaryService;
+import com.coders.diaryservice.service.EmotionTagService;
+import com.coders.diaryservice.service.EventTagService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,53 +18,44 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/diary")
+@RequestMapping("/api/v1")
+@AllArgsConstructor
+@Slf4j
 public class DiaryController {
 
-    @Autowired
-    private DiaryService diaryService;
 
-    @PostMapping
-    public Diary createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
-        String accountIdStr = request.getHeader("account_id");
-        if (accountIdStr == null || accountIdStr.isEmpty()) {
-            throw new IllegalArgumentException("Missing account_id header");
-        }
+    private final DiaryService diaryService;
 
-        Long accountId;
-        try {
-            accountId = Long.parseLong(accountIdStr);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid account_id format");
-        }
+    private final EmotionTagService emotionTagService;
 
-        Diary diary = new Diary();
-        diary.setAccountId(accountId);
-        diary.setContent(diaryRequest.getContent());
-        diary.setCoreEmotionTag(diaryRequest.getCoreEmotionTag());
-        diary.setDateCreated(new Date());
+    private final EventTagService eventTagService;
 
-        return diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
+
+    @PostMapping("/diary")
+    public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
+        Long accountId = Long.parseLong(request.getHeader("X-User-Id"));
+        Diary diary = Diary.builder()
+                        .accountId(accountId)
+                        .content(diaryRequest.getContent())
+                        .coreEmotionTag(emotionTagService.findByOne(diaryRequest.getCoreEmotionTagId(), diaryRequest.getEmotionTagIds()))
+                        .dateCreated(new Date()).build();
+        diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public List<Diary> getDiariesByAccountId(HttpServletRequest request) {
-        String accountIdStr = request.getHeader("account_id");
-        if (accountIdStr == null || accountIdStr.isEmpty()) {
-            throw new IllegalArgumentException("Missing account_id header");
-        }
-        Long accountId = Long.parseLong(accountIdStr);
-        return diaryService.getDiariesByAccountId(accountId);
+    @PostMapping("/eventTag")
+    public ResponseEntity<Void> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {
+        eventTagService.createEventTagAndUpdateUser(eventTagName,
+                Long.parseLong(request.getHeader("X-User-Id")));
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{diaryNo}")
-    public Optional<Diary> getDiaryDetails(@PathVariable Long diaryNo, HttpServletRequest request) {
-        String accountIdStr = request.getHeader("account_id");
-        if (accountIdStr == null || accountIdStr.isEmpty()) {
-            throw new IllegalArgumentException("Missing account_id header");
-        }
-        Long accountId = Long.parseLong(accountIdStr);
-        return diaryService.getDiaryDetails(accountId, diaryNo);
+    @GetMapping("/diary")
+    public ResponseEntity<List<DiaryDto>> getDiaries(
+            @RequestParam(required = false) Long lastNo,
+            @RequestParam(defaultValue = "10") int size, HttpServletRequest request) {
+        List<DiaryDto> diaries = diaryService.getDiaries(lastNo, size, Long.parseLong(request.getHeader("X-User-Id")));
+        return ResponseEntity.ok(diaries);
     }
 
     @DeleteMapping("/{diaryNo}")
@@ -73,32 +68,7 @@ public class DiaryController {
         diaryService.deleteDiary(accountId, diaryNo);
     }
 
-    @PostMapping("/{diaryNo}/events")
-    public ResponseEntity<String> addEventToDiary(
-            @RequestHeader("account_id") Long accountId,
-            @PathVariable Long diaryNo,
-            @RequestBody Map<String, String> requestBody) {
 
-        String eventName = requestBody.get("eventName");
 
-        if (eventName == null || eventName.isEmpty()) {
-            return ResponseEntity.badRequest().body("Event name is required");
-        }
 
-        diaryService.addEventToDiary(diaryNo, accountId, eventName);
-        return ResponseEntity.ok("Event added successfully");
-    }
-
-    @GetMapping("/events")
-    public List<Map<String, Object>> getDistinctEventTagsByAccountId(HttpServletRequest request) {
-        String accountIdStr = request.getHeader("account_id");
-        if (accountIdStr == null || accountIdStr.isEmpty()) {
-            throw new IllegalArgumentException("Missing account_id header");
-        }
-        Long accountId = Long.parseLong(accountIdStr);
-        List<Object[]> eventTags = diaryService.getDistinctEventTagsByAccountId(accountId);
-
-        // Convert the result to a list of maps for better JSON representation
-        return eventTags.stream().map(tag -> Map.of("eventTagNo", tag[0], "name", tag[1])).toList();
-    }
 }

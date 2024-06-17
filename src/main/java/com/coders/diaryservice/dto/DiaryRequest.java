@@ -1,5 +1,6 @@
 package com.coders.diaryservice.dto;
 
+import com.coders.diaryservice.entity.EventTag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @Builder
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class DiaryRequest {
 
@@ -19,11 +19,10 @@ public class DiaryRequest {
     @Size(max = 500)
     private String content;
     @NotNull
-    private String coreEmotionTag;
+    private Long coreEmotionTagId;
     @NotNull
     private List<Long> eventTagIds;
     @NotNull
     private List<Long> emotionTagIds;
-
 }
 
