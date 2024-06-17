@@ -5,7 +5,7 @@ on:
     tags: [ 'v*.*.*' ]
 
 env:
-  IMAGE_NAME: "sunwoo3856/gateway"
+  IMAGE_NAME: "sunwoo3856/diary-service"
   REGISTRY: "docker.io"
 
 jobs:
