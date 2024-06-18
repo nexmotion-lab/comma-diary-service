@@ -2,6 +2,8 @@ package com.coders.diaryservice.controller;
 
 import com.coders.diaryservice.dto.DiaryDto;
 import com.coders.diaryservice.dto.DiaryRequest;
+import com.coders.diaryservice.dto.EventTagDto;
+import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.Diary;
 import com.coders.diaryservice.service.DiaryService;
 import com.coders.diaryservice.service.EmotionTagService;
@@ -16,9 +18,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/diary")
 @AllArgsConstructor
 @Slf4j
 public class DiaryController {
@@ -31,7 +34,7 @@ public class DiaryController {
     private final EventTagService eventTagService;
 
 
-    @PostMapping("/diary")
+    @PostMapping()
     public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
         Long accountId = Long.parseLong(request.getHeader("X-User-Id"));
         Diary diary = Diary.builder()
@@ -50,11 +53,14 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/diary")
+    @GetMapping()
     public ResponseEntity<List<DiaryDto>> getDiaries(
             @RequestParam(required = false) Long lastNo,
-            @RequestParam(defaultValue = "10") int size, HttpServletRequest request) {
-        List<DiaryDto> diaries = diaryService.getDiaries(lastNo, size, Long.parseLong(request.getHeader("X-User-Id")));
+            @RequestParam(defaultValue = "10") int size, HttpServletRequest request,
+            @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate,
+            @RequestParam(required = false) List<Long> emotionTagIds, @RequestParam(required = false) List<Long> eventTagIds) {
+        List<DiaryDto> diaries = diaryService.getDiaries(lastNo, size, Long.parseLong(request.getHeader("X-User-Id")),
+                startDate, endDate, emotionTagIds, eventTagIds);
         return ResponseEntity.ok(diaries);
     }
 
@@ -68,7 +74,11 @@ public class DiaryController {
         diaryService.deleteDiary(accountId, diaryNo);
     }
 
-
+    @GetMapping("/eventTag")
+    public ResponseEntity<List<EventTagDto>> getEventTags(HttpServletRequest request) {
+        return ResponseEntity.ok(diaryService.getEventTagsByAccountId(Long.parseLong(request.getHeader("X-User-Id")))
+                .stream().map(DiaryMapper::toEventTagDto).collect(Collectors.toList()));
+    }
 
 
 }

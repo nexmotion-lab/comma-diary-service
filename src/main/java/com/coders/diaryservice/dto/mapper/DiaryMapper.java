@@ -2,9 +2,11 @@ package com.coders.diaryservice.dto.mapper;
 
 import com.coders.diaryservice.dto.*;
 import com.coders.diaryservice.entity.*;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+@Component
 public class DiaryMapper {
 
     public static DiaryDto toDto(Diary diary) {
@@ -22,7 +24,7 @@ public class DiaryMapper {
         return diaryDto;
     }
 
-    private static EmotionTagDto toEmotionTagDto(EmotionTag emotionTag) {
+    public static EmotionTagDto toEmotionTagDto(EmotionTag emotionTag) {
         if (emotionTag == null) return null;
 
         EmotionTagDto dto = new EmotionTagDto();
@@ -52,7 +54,7 @@ public class DiaryMapper {
         return dto;
     }
 
-    private static EventTagDto toEventTagDto(EventTag eventTag) {
+    public static EventTagDto toEventTagDto(EventTag eventTag) {
         if (eventTag == null) return null;
 
         EventTagDto dto = new EventTagDto();
