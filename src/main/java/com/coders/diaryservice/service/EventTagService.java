@@ -1,6 +1,7 @@
 package com.coders.diaryservice.service;
 
 import com.coders.diaryservice.entity.AccountPerEventTag;
+import com.coders.diaryservice.entity.EmotionTag;
 import com.coders.diaryservice.entity.EventTag;
 import com.coders.diaryservice.repository.AccountPerEventTagRepository;
 import com.coders.diaryservice.repository.EventTagRepository;
@@ -25,9 +26,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.YearMonth;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -68,5 +68,18 @@ public class EventTagService {
         eventTags.add(eventTag);
         accountPerEventTag.setEventTags(eventTags);
         accountPerEventTagRepository.save(accountPerEventTag);
+    }
+
+    public Map<EventTag,Integer> findByYearMonthForStatistics(Long accountId, YearMonth yearMonth) {
+        List<EventTag> eventTags = eventTagRepository
+                .findEventTagsWithDiaryNoByAccountIdAndYearMonth(accountId, yearMonth.toString());
+
+        Map<EventTag, Integer> eventTagCountMap = new HashMap<>();
+
+        for (EventTag eventTag : eventTags) {
+            eventTagCountMap.put(eventTag, eventTagCountMap.getOrDefault(eventTag, 0) + 1);
+        }
+
+        return eventTagCountMap;
     }
 }
