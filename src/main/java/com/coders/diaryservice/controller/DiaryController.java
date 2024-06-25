@@ -35,6 +35,7 @@ public class DiaryController {
 
 
     @PostMapping()
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
         Long accountId = Long.parseLong(request.getHeader("X-User-Id"));
         Diary diary = Diary.builder()
@@ -47,6 +48,7 @@ public class DiaryController {
     }
 
     @PostMapping("/eventTag")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Void> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {
         eventTagService.createEventTagAndUpdateUser(eventTagName,
                 Long.parseLong(request.getHeader("X-User-Id")));
@@ -54,6 +56,7 @@ public class DiaryController {
     }
 
     @GetMapping()
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<List<DiaryDto>> getDiaries(
             @RequestParam(required = false) Long lastNo,
             @RequestParam(defaultValue = "10") int size, HttpServletRequest request,
@@ -65,6 +68,7 @@ public class DiaryController {
     }
 
     @DeleteMapping("/{diaryNo}")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public void deleteDiary(@PathVariable Long diaryNo, HttpServletRequest request) {
         String accountIdStr = request.getHeader("account_id");
         if (accountIdStr == null || accountIdStr.isEmpty()) {
@@ -75,6 +79,7 @@ public class DiaryController {
     }
 
     @GetMapping("/eventTag")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<List<EventTagDto>> getEventTags(HttpServletRequest request) {
         return ResponseEntity.ok(diaryService.getEventTagsByAccountId(Long.parseLong(request.getHeader("X-User-Id")))
                 .stream().map(DiaryMapper::toEventTagDto).collect(Collectors.toList()));

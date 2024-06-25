@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
 import java.util.AbstractMap;
@@ -28,6 +25,7 @@ public class EmotionController {
     private final DiaryMapper diaryMapper;
 
     @GetMapping("/statistics")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<EmotionTagDto, Integer>> getEmotionTagsForStatistics(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                       HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
@@ -48,6 +46,7 @@ public class EmotionController {
     }
 
     @GetMapping("/calendar")
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<Date, String>> getEmotionTagsForCalendar(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                        HttpServletRequest request) {
         Map<Date, String> calendarEmotionTags = emotionTagService.findByDateForCalendar(
