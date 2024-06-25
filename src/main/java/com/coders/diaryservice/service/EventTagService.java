@@ -70,9 +70,9 @@ public class EventTagService {
         accountPerEventTagRepository.save(accountPerEventTag);
     }
 
-    public Map<EventTag,Integer> findByYearMonthForStatistics(Long accountId, YearMonth yearMonth) {
+    public Map<EventTag,Integer> findByYearMonthForStatistics(Long accountId, YearMonth yearMonth, Integer emotionId) {
         List<EventTag> eventTags = eventTagRepository
-                .findEventTagsWithDiaryNoByAccountIdAndYearMonth(accountId, yearMonth.toString());
+                .findEventTagsWithDiaryNoByAccountIdAndYearMonth(accountId, yearMonth.toString(), emotionId);
 
         Map<EventTag, Integer> eventTagCountMap = new HashMap<>();
 

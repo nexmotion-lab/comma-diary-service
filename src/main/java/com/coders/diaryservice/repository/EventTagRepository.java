@@ -16,11 +16,11 @@ public interface EventTagRepository extends JpaRepository<EventTag, Long> {
             "FROM diary d " +
             "JOIN diary_per_event_tag det ON d.diary_no = det.diary_no " +
             "JOIN event_tag et ON det.event_tag_no = et.event_tag_no " +
-            "WHERE d.account_id = :accountId " +
+            "WHERE d.account_id = :accountId AND d.core_emotion_tag = :emotionId " +
             "AND DATE_FORMAT(d.date_created, '%Y-%m') = :yearMonth",
             nativeQuery = true)
     List<EventTag> findEventTagsWithDiaryNoByAccountIdAndYearMonth(
-            Long accountId, String yearMonth);
+            Long accountId, String yearMonth, Integer emotionId);
 
 
 

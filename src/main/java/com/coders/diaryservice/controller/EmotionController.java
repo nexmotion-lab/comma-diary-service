@@ -61,10 +61,10 @@ public class EmotionController {
     @GetMapping("/statistics/event")
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<EventTagDto, Integer>> getEventTagsForStatistics(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
-                                                                                   HttpServletRequest request) {
+                                                                                   HttpServletRequest request, @RequestParam Integer emotionId) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
 
-        Map<EventTag, Integer> eventTagCountMap = eventTagService.findByYearMonthForStatistics(userId, yearMonth);
+        Map<EventTag, Integer> eventTagCountMap = eventTagService.findByYearMonthForStatistics(userId, yearMonth, emotionId);
 
         Map<EventTagDto, Integer> responseMap = eventTagCountMap.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleEntry<>(
