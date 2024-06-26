@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +25,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DynamicDiar
             "AND FUNCTION('MONTH', d.dateCreated) = :month " +
             "AND d.accountId = :accountId")
     List<Diary> findByYearMonth(int year, int month, Long accountId);
+
+    @Query("SELECT d FROM Diary d WHERE FUNCTION('DATE', d.dateCreated) = :date")
+    Optional<Diary> findByDateCreated(LocalDate date);
 }
