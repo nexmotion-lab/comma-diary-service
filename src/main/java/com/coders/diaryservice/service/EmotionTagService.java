@@ -42,11 +42,11 @@ public class EmotionTagService {
         return emotionTagCountMap;
     }
 
-    public Map<Date, String> findByDateForCalendar(Long accountId, YearMonth yearMonth) {
+    public Map<Date, Long> findByDateForCalendar(Long accountId, YearMonth yearMonth) {
         List<Diary> diaries = diaryRepository.findByYearMonth(yearMonth.getYear(), yearMonth.getMonthValue(), accountId);
 
         return diaries.stream().map(diary -> new AbstractMap.SimpleEntry<>(
-                diary.getDateCreated(), "emotionTagNo: " + diary.getCoreEmotionTag().getEmotionTagNo()))
+                diary.getDateCreated(), diary.getCoreEmotionTag().getEmotionTagNo()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
