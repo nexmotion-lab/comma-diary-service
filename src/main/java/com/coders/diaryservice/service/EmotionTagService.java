@@ -9,7 +9,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,11 +45,16 @@ public class EmotionTagService {
         return emotionTagCountMap;
     }
 
-    public Map<Date, Long> findByDateForCalendar(Long accountId, YearMonth yearMonth) {
+    public Map<String, Long> findByDateForCalendar(Long accountId, YearMonth yearMonth) {
         List<Diary> diaries = diaryRepository.findByYearMonth(yearMonth.getYear(), yearMonth.getMonthValue(), accountId);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-        return diaries.stream().map(diary -> new AbstractMap.SimpleEntry<>(
-                diary.getDateCreated(), diary.getCoreEmotionTag().getEmotionTagNo()))
+        return diaries.stream()
+                .map(diary -> {
+                    Date date = diary.getDateCreated();
+                    String formattedDate = formatter.format(date);
+                    return new AbstractMap.SimpleEntry<>(formattedDate, diary.getCoreEmotionTag().getEmotionTagNo());
+                })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

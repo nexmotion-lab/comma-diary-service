@@ -50,9 +50,9 @@ public class EmotionController {
 
     @GetMapping("/calendar")
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<Map<Date, Long>> getEmotionTagsForCalendar(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
+    public ResponseEntity<Map<String, Long>> getEmotionTagsForCalendar(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                        HttpServletRequest request) {
-        Map<Date, Long> calendarEmotionTags = emotionTagService.findByDateForCalendar(
+        Map<String, Long> calendarEmotionTags = emotionTagService.findByDateForCalendar(
                 Long.parseLong(request.getHeader("X-User-Id")), yearMonth);
 
         return ResponseEntity.ok(calendarEmotionTags);
