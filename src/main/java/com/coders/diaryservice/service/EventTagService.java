@@ -1,5 +1,7 @@
 package com.coders.diaryservice.service;
 
+import com.coders.diaryservice.dto.EventTagDto;
+import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.AccountPerEventTag;
 import com.coders.diaryservice.entity.EmotionTag;
 import com.coders.diaryservice.entity.EventTag;
@@ -40,9 +42,10 @@ public class EventTagService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void createEventTagAndUpdateUser(String eventTag, Long accountId) {
+    public EventTagDto createEventTagAndUpdateUser(String eventTag, Long accountId) {
         EventTag newEventTag = createEventTag(eventTag);
         updateAccountPerEventTag(newEventTag, accountId);
+        return DiaryMapper.toEventTagDto(newEventTag);
     }
 
 

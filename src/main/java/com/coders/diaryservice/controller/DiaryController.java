@@ -5,6 +5,7 @@ import com.coders.diaryservice.dto.DiaryRequest;
 import com.coders.diaryservice.dto.EventTagDto;
 import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.Diary;
+import com.coders.diaryservice.entity.EventTag;
 import com.coders.diaryservice.service.DiaryService;
 import com.coders.diaryservice.service.EmotionTagService;
 import com.coders.diaryservice.service.EventTagService;
@@ -49,10 +50,10 @@ public class DiaryController {
 
     @PostMapping("/eventTag")
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<Void> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {
-        eventTagService.createEventTagAndUpdateUser(eventTagName,
+    public ResponseEntity<EventTagDto> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {
+        EventTagDto newEventTag = eventTagService.createEventTagAndUpdateUser(eventTagName,
                 Long.parseLong(request.getHeader("X-User-Id")));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(newEventTag);
     }
 
     @GetMapping()
