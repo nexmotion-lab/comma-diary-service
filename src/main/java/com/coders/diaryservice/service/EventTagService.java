@@ -67,7 +67,7 @@ public class EventTagService {
                 .orElseThrow(() -> new EntityNotFoundException("AccountPerEventTag not found"));
         List<EventTag> eventTags = accountPerEventTag.getEventTags();
         if (eventTags.contains(eventTag)) {
-            throw new DuplicateEventTagUpdateException(String.format("이미 [{0}] 사건태그가 존재합니다.", eventTag.getName()));
+            throw new DuplicateEventTagUpdateException("이미 [" + eventTag.getName() + "] 사건태그가 존재합니다.");
         }
         eventTags.add(eventTag);
         accountPerEventTag.setEventTags(eventTags);
