@@ -5,6 +5,7 @@ import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.AccountPerEventTag;
 import com.coders.diaryservice.entity.EmotionTag;
 import com.coders.diaryservice.entity.EventTag;
+import com.coders.diaryservice.exception.eventTag.DuplicateEventTagUpdateException;
 import com.coders.diaryservice.repository.AccountPerEventTagRepository;
 import com.coders.diaryservice.repository.EventTagRepository;
 import jakarta.persistence.EntityManager;
@@ -66,7 +67,7 @@ public class EventTagService {
                 .orElseThrow(() -> new EntityNotFoundException("AccountPerEventTag not found"));
         List<EventTag> eventTags = accountPerEventTag.getEventTags();
         if (eventTags.contains(eventTag)) {
-            throw new IllegalArgumentException("EventTag already exists for the account");
+            throw new DuplicateEventTagUpdateException(String.format("이미 [{0}] 사건태그가 존재합니다.", eventTag.getName()));
         }
         eventTags.add(eventTag);
         accountPerEventTag.setEventTags(eventTags);
