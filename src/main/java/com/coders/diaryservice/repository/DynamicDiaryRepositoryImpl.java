@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,8 +24,8 @@ public class DynamicDiaryRepositoryImpl implements DynamicDiaryRepository{
     private final EntityManager entityManager;
 
     @Override
-    public Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, Date startDate,
-                                             Date endDate, List<Long> emotionTagIds, List<Long> eventTagIds, Pageable pageable) {
+    public Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, LocalDate startDate,
+                                             LocalDate endDate, List<Long> emotionTagIds, List<Long> eventTagIds, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Diary> query = cb.createQuery(Diary.class);
         Root<Diary> diary = query.from(Diary.class);
@@ -39,7 +40,7 @@ public class DynamicDiaryRepositoryImpl implements DynamicDiaryRepository{
         }
 
         if (startDate != null && endDate != null) {
-            predicates.add(cb.between(diary.get("dateCreated"), startDate, endDate));
+            predicates.add(cb.between(cb.function("DATE", LocalDate.class, diary.get("dateCreated")), startDate, endDate));
         }
 
         if (emotionTagIds != null && !emotionTagIds.isEmpty()) {

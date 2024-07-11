@@ -12,9 +12,13 @@ import com.coders.diaryservice.service.EventTagService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +43,16 @@ public class DiaryController {
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
         Long accountId = Long.parseLong(request.getHeader("X-User-Id"));
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Date dateCreated = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+
         Diary diary = Diary.builder()
                         .accountId(accountId)
                         .content(diaryRequest.getContent())
                         .coreEmotionTag(emotionTagService.findByOne(diaryRequest.getCoreEmotionTagId(), diaryRequest.getEmotionTagIds()))
-                        .dateCreated(new Date()).build();
+                        .dateCreated(dateCreated).build();
         diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
         return ResponseEntity.ok().build();
     }
@@ -61,13 +70,13 @@ public class DiaryController {
     public ResponseEntity<List<DiaryDto>> getDiaries(
             @RequestParam(required = false) Long lastNo,
             @RequestParam(defaultValue = "10") int size, HttpServletRequest request,
-            @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) List<Long> emotionTagIds, @RequestParam(required = false) List<Long> eventTagIds) {
         List<DiaryDto> diaries = diaryService.getDiaries(lastNo, size, Long.parseLong(request.getHeader("X-User-Id")),
                 startDate, endDate, emotionTagIds, eventTagIds);
         return ResponseEntity.ok(diaries);
     }
-
     @DeleteMapping("/{diaryNo}")
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public void deleteDiary(@PathVariable Long diaryNo, HttpServletRequest request) {

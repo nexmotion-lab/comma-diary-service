@@ -53,7 +53,7 @@ public class DiaryService {
         emotionTagDao.batchInsertEmotionTags(emotionTagIds, diary.getDiaryNo());
     }
 
-    public List<DiaryDto> getDiaries(Long lastNo, int size, Long accountId, Date startDate, Date endDate, List<Long> emotionTagIds, List<Long> eventTagIds) {
+    public List<DiaryDto> getDiaries(Long lastNo, int size, Long accountId, LocalDate startDate, LocalDate endDate, List<Long> emotionTagIds, List<Long> eventTagIds) {
         Pageable pageable = Pageable.ofSize(size);
         Page<Diary> diaryPage = diaryRepository.findDiariesByCriteria(lastNo, accountId, startDate, endDate, emotionTagIds, eventTagIds, pageable);
         return diaryPage.stream()

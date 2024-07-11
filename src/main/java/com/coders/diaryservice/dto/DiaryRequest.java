@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryRequest {
 
-    private Long account_id;
     @NotNull
     @Size(max = 500)
     private String content;
