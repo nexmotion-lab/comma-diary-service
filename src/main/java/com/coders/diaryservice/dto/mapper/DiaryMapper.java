@@ -14,12 +14,13 @@ public class DiaryMapper {
 
         DiaryDto diaryDto = new DiaryDto();
         diaryDto.setDiaryNo(diary.getDiaryNo());
-        diaryDto.setAccountId(diary.getAccountId());
         diaryDto.setContent(diary.getContent());
         diaryDto.setDateCreated(diary.getDateCreated());
         diaryDto.setCoreEmotionTag(toEmotionTagDto(diary.getCoreEmotionTag()));
-        diaryDto.setEventTags(diary.getEventTags().stream().map(DiaryMapper::toDiaryPerEventTagDto).collect(Collectors.toList()));
-        diaryDto.setEmotionTags(diary.getEmotionTags().stream().map(DiaryMapper::toDiaryPerEmotionTagDto).collect(Collectors.toList()));
+        diaryDto.setEventTags(diary.getEventTags().stream().map(DiaryMapper::toDiaryPerEventTagDto)
+                .map(DiaryPerEventTagDto::getEventTag).collect(Collectors.toList()));
+        diaryDto.setEmotionTags(diary.getEmotionTags().stream().map(DiaryMapper::toDiaryPerEmotionTagDto)
+                .map(DiaryPerEmotionTagDto::getEmotionTag).collect(Collectors.toList()));
 
         return diaryDto;
     }

@@ -10,10 +10,9 @@ import java.util.List;
 public class DiaryDto {
 
     private Long diaryNo;
-    private Long accountId;
     private String content;
     private Date dateCreated;
     private EmotionTagDto coreEmotionTag;
-    private List<DiaryPerEventTagDto> eventTags;
-    private List<DiaryPerEmotionTagDto> emotionTags;
+    private List<EventTagDto> eventTags;
+    private List<EmotionTagDto> emotionTags;
 }
