@@ -72,9 +72,10 @@ public class DiaryController {
             @RequestParam(defaultValue = "10") int size, HttpServletRequest request,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) List<Long> emotionTagIds, @RequestParam(required = false) List<Long> eventTagIds) {
+            @RequestParam(required = false) List<Long> emotionTagIds, @RequestParam(required = false) List<Long> eventTagIds,
+            @RequestParam boolean orderByDesc) {
         List<DiaryDto> diaries = diaryService.getDiaries(lastNo, size, Long.parseLong(request.getHeader("X-User-Id")),
-                startDate, endDate, emotionTagIds, eventTagIds);
+                startDate, endDate, emotionTagIds, eventTagIds, orderByDesc);
         return ResponseEntity.ok(diaries);
     }
     @DeleteMapping("/{diaryNo}")

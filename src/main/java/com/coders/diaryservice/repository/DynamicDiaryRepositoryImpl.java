@@ -24,7 +24,7 @@ public class DynamicDiaryRepositoryImpl implements DynamicDiaryRepository{
     private final EntityManager entityManager;
 
     @Override
-    public Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, LocalDate startDate,
+    public Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, LocalDate startDate, boolean orderByDesc,
                                              LocalDate endDate, List<Long> emotionTagIds, List<Long> eventTagIds, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Diary> query = cb.createQuery(Diary.class);
@@ -32,8 +32,10 @@ public class DynamicDiaryRepositoryImpl implements DynamicDiaryRepository{
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (lastNo != null) {
+        if (lastNo != null && orderByDesc) {
             predicates.add(cb.lessThan(diary.get("diaryNo"), lastNo));
+        } else if (lastNo != null && !orderByDesc) {
+            predicates.add(cb.greaterThan(diary.get("diaryNo"), lastNo));
         }
         if (accountId != null) {
             predicates.add(cb.equal(diary.get("accountId"), accountId));
@@ -54,8 +56,13 @@ public class DynamicDiaryRepositoryImpl implements DynamicDiaryRepository{
         }
 
         query.select(diary)
-                .where(predicates.toArray(new Predicate[0]))
-                .orderBy(cb.desc(diary.get("diaryNo")));
+                .where(predicates.toArray(new Predicate[0]));
+
+        if (orderByDesc) {
+            query.orderBy(cb.desc(diary.get("diaryNo")));
+        } else {
+            query.orderBy(cb.asc(diary.get("diaryNo")));
+        }
 
         List<Diary> resultList = entityManager.createQuery(query)
                 .setMaxResults(pageable.getPageSize())

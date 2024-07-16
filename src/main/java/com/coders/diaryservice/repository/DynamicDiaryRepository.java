@@ -10,5 +10,6 @@ import java.util.List;
 
 public interface DynamicDiaryRepository {
 
-    Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, LocalDate startDate, LocalDate endDate, List<Long> emotionTagIds, List<Long> eventTagIds, Pageable pageable);
+    Page<Diary> findDiariesByCriteria(Long lastNo, Long accountId, LocalDate startDate, boolean orderByDesc,
+                                      LocalDate endDate, List<Long> emotionTagIds, List<Long> eventTagIds, Pageable pageable);
 }
