@@ -42,7 +42,9 @@ public class DiaryController {
     @PostMapping()
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
+        log.info(request.getHeader("X-User-Id"));
         Long accountId = Long.parseLong(request.getHeader("X-User-Id"));
+
 
         LocalDateTime localDateTime = LocalDateTime.now();
         Date dateCreated = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
