@@ -28,7 +28,6 @@ public class EmotionController {
     private final EventTagService eventTagService;
 
     @GetMapping("/statistics/emotion")
-    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<EmotionTagDto, Integer>> getEmotionTagsForStatistics(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                       HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
@@ -49,7 +48,6 @@ public class EmotionController {
     }
 
     @GetMapping("/calendar")
-    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<String, Long>> getEmotionTagsForCalendar(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                        HttpServletRequest request) {
         Map<String, Long> calendarEmotionTags = emotionTagService.findByDateForCalendar(
@@ -59,7 +57,6 @@ public class EmotionController {
     }
 
     @GetMapping("/statistics/event")
-    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Map<EventTagDto, Integer>> getEventTagsForStatistics(@RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
                                                                                    HttpServletRequest request, @RequestParam Integer emotionId) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
