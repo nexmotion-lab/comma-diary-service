@@ -2,6 +2,7 @@ package com.coders.diaryservice.repository;
 
 import com.coders.diaryservice.entity.Diary;
 import com.coders.diaryservice.entity.EmotionTag;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,10 +23,13 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DynamicDiar
     Optional<Diary> findByDiaryNoAndAccountId(Long diaryNo, Long accountId);
 
     @Query("SELECT d FROM Diary d " +
-            "WHERE FUNCTION('YEAR', d.dateCreated) = :year " +
-            "AND FUNCTION('MONTH', d.dateCreated) = :month " +
+            "WHERE d.dateCreated BETWEEN :startDate AND :endDate " +
             "AND d.accountId = :accountId")
-    List<Diary> findByYearMonth(int year, int month, Long accountId);
+    List<Diary> findDiariesWithinDateRange(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("accountId") Long accountId);
+
 
     @Query("SELECT d FROM Diary d WHERE FUNCTION('DATE', d.dateCreated) = :date")
     Optional<Diary> findByDateCreated(LocalDate date);

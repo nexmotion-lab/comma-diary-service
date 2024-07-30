@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +47,17 @@ public class EmotionTagService {
     }
 
     public Map<String, Long> findByDateForCalendar(Long accountId, YearMonth yearMonth) {
-        List<Diary> diaries = diaryRepository.findByYearMonth(yearMonth.getYear(), yearMonth.getMonthValue(), accountId);
+        LocalDate firstDayOfMonth = yearMonth.atDay(1);
+        LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
+
+        LocalDate startDate = firstDayOfMonth.minusDays(14);
+        LocalDate endDate = lastDayOfMonth.plusDays(14);
+
+        Date start = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+
+        List<Diary> diaries = diaryRepository.findDiariesWithinDateRange(start, end, accountId);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         return diaries.stream()
