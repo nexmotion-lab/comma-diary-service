@@ -17,10 +17,11 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "account_event_tags")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 public class AccountPerEventTag implements Persistable<Long> {
 
     @Id
+    @Setter
     private Long accountId;
 
     private String eventTags;

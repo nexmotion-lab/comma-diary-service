@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +73,13 @@ public class DiaryService {
 
 
     public List<EventTag> getEventTagsByAccountId(Long accountId) {
-        return accountPerEventTagRepository.findByAccountId(accountId).orElseThrow(
-                () -> new EntityNotFoundException("EventTag not found")).getEventTags();
+        return accountPerEventTagRepository.findByAccountId(accountId).map(AccountPerEventTag::getEventTags).orElseGet(() -> {
+            AccountPerEventTag accountPerEventTag = new AccountPerEventTag();
+            accountPerEventTag.setAccountId(accountId);
+            accountPerEventTag.setEventTags(new ArrayList<>());
+            accountPerEventTagRepository.save(accountPerEventTag);
+
+            return accountPerEventTag.getEventTags();
+        });
     }
 }
