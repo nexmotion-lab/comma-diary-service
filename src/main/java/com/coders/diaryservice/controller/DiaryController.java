@@ -54,7 +54,7 @@ public class DiaryController {
                         .content(diaryRequest.getContent())
                         .coreEmotionTag(emotionTagService.findByOne(diaryRequest.getCoreEmotionTagId(), diaryRequest.getEmotionTagIds()))
                         .dateCreated(dateCreated).build();
-        diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds());
+        diaryService.createDiary(diary, diaryRequest.getEventTagIds(), diaryRequest.getEmotionTagIds(), accountId);
         return ResponseEntity.ok().build();
     }
 

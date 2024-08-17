@@ -17,8 +17,8 @@ import java.util.Optional;
 
 public interface DiaryRepository extends JpaRepository<Diary, Long>, DynamicDiaryRepository{
 
-    @Query("SELECT d FROM Diary d WHERE (:lastNo IS NULL OR d.diaryNo < :lastNo) AND d.accountId = :accountId ORDER BY d.diaryNo DESC")
-    Page<Diary> findByLastId(Long lastNo, Pageable pageable, Long accountId);
+    @Query("SELECT d.coreEmotionTag FROM Diary d WHERE d.accountId = :accountId ORDER BY d.diaryNo DESC")
+    List<EmotionTag> findTop10CoreEmotionByAccountId(Long accountId, Pageable pageable);
     
     Optional<Diary> findByDiaryNoAndAccountId(Long diaryNo, Long accountId);
 
@@ -30,7 +30,14 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DynamicDiar
             @Param("endDate") Date endDate,
             @Param("accountId") Long accountId);
 
+    @Query("SELECT COUNT(d) FROM Diary d " +
+            "WHERE d.dateCreated > :sevenDaysAgo " +
+            "AND d.accountId = :accountId")
+    long countDiariesAfterDate(
+            @Param("sevenDaysAgo") Date sevenDaysAgo,
+            @Param("accountId") Long accountId);
 
-    @Query("SELECT d FROM Diary d WHERE FUNCTION('DATE', d.dateCreated) = :date")
-    Optional<Diary> findByDateCreated(LocalDate date);
+
+    @Query("SELECT d FROM Diary d WHERE FUNCTION('DATE', d.dateCreated) = :date AND d.accountId = :id")
+    Optional<Diary> findByDateCreated(LocalDate date, Long id);
 }

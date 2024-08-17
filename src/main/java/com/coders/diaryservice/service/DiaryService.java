@@ -36,13 +36,13 @@ public class DiaryService {
     private final AccountPerEventTagRepository accountPerEventTagRepository;
 
     @Transactional
-    public void createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds) {
+    public void createDiary(Diary diary, List<Long> eventTagIds, List<Long> emotionTagIds, Long accountId) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = formatter.format(diary.getDateCreated());
 
         LocalDate localDate = LocalDate.parse(formattedDate);
 
-        Optional<Diary> existingDiary = diaryRepository.findByDateCreated(localDate);
+        Optional<Diary> existingDiary = diaryRepository.findByDateCreated(localDate, accountId);
         log.info(existingDiary.toString());
         if (existingDiary.isPresent()) {
             throw new DiaryException("이미 오늘 작성한 일기가 존재합니다.");
