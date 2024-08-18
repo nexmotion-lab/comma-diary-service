@@ -22,6 +22,13 @@ public interface DiaryRepository extends JpaRepository<Diary, Long>, DynamicDiar
     
     Optional<Diary> findByDiaryNoAndAccountId(Long diaryNo, Long accountId);
 
+    @Query("SELECT COUNT(d) " +
+            "FROM Diary d " +
+            "JOIN d.eventTags det " +
+            "WHERE d.accountId = :accountId " +
+            "AND det.id.eventTagNo = :eventTagNo")
+    Long countByAccountIdAndEventTagNo(Long accountId, Long eventTagNo);
+
     @Query("SELECT d FROM Diary d " +
             "WHERE d.dateCreated BETWEEN :startDate AND :endDate " +
             "AND d.accountId = :accountId")

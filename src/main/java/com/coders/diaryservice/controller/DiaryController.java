@@ -58,11 +58,20 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("")
+
     @PostMapping("/eventTag")
     public ResponseEntity<EventTagDto> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {
         EventTagDto newEventTag = eventTagService.createEventTagAndUpdateUser(eventTagName,
                 Long.parseLong(request.getHeader("X-User-Id")));
         return ResponseEntity.ok(newEventTag);
+    }
+
+    @DeleteMapping("/eventTag")
+    public ResponseEntity<Void> deleteEventTag(@RequestParam Long eventTagNo,
+                                               @RequestHeader("X-User-Id") Long accountId) {
+        eventTagService.deleteAccountPerEventTag(eventTagNo, accountId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping()

@@ -1,5 +1,6 @@
 package com.coders.diaryservice.exception;
 
+import com.coders.diaryservice.exception.eventTag.CannotDeleteEventTagException;
 import com.coders.diaryservice.exception.eventTag.DuplicateEventTagUpdateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,20 +19,32 @@ import java.util.Arrays;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ProblemDetail> allExceptionHandle(Exception ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        problemDetail.setTitle("예상치 못한 오류");
-        log.error(Arrays.toString(ex.getStackTrace()));
-
-        return new ResponseEntity<>(problemDetail, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(DuplicateEventTagUpdateException.class)
-    public ResponseEntity<ProblemDetail> handleDuplicateEventTagUpdateException(Exception ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    public ResponseEntity<ProblemDetail> handleAllExceptions(Exception ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(determineHttpStatus(ex), ex.getMessage());
         problemDetail.setInstance(URI.create(request.getDescription(false)));
-        problemDetail.setProperty("errorCode", "101");
+        problemDetail.setProperty("errorCode", determineErrorCode(ex));
 
-        return new ResponseEntity<>(problemDetail, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(problemDetail, determineHttpStatus(ex));
     }
+
+    private HttpStatus determineHttpStatus(Exception ex) {
+        if (ex instanceof DuplicateEventTagUpdateException) {
+            return HttpStatus.CONFLICT;
+        } else if (ex instanceof CannotDeleteEventTagException) {
+            return HttpStatus.CONFLICT;
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private String determineErrorCode(Exception ex) {
+        if (ex instanceof DuplicateEventTagUpdateException) {
+            return "101";
+        } else if (ex instanceof CannotDeleteEventTagException) {
+            return "102";
+        }
+        return "500";
+    }
+
+
 }

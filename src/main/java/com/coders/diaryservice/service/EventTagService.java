@@ -5,8 +5,10 @@ import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.AccountPerEventTag;
 import com.coders.diaryservice.entity.EmotionTag;
 import com.coders.diaryservice.entity.EventTag;
+import com.coders.diaryservice.exception.eventTag.CannotDeleteEventTagException;
 import com.coders.diaryservice.exception.eventTag.DuplicateEventTagUpdateException;
 import com.coders.diaryservice.repository.AccountPerEventTagRepository;
+import com.coders.diaryservice.repository.DiaryRepository;
 import com.coders.diaryservice.repository.EventTagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,9 +41,30 @@ public class EventTagService {
 
     private final EventTagRepository eventTagRepository;
     private final AccountPerEventTagRepository accountPerEventTagRepository;
+    private final DiaryRepository diaryRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public void deleteAccountPerEventTag(Long eventTagNo, Long accountId) {
+        Long count = diaryRepository.countByAccountIdAndEventTagNo(accountId, eventTagNo);
+        if (count > 0) {
+            throw new CannotDeleteEventTagException("해당 태그가 사용된 일기가 존재합니다.");
+        }
+
+        AccountPerEventTag accountPerEventTag = accountPerEventTagRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new EntityNotFoundException("AccountPerEventTag not found"));
+
+        List<EventTag> eventTags = accountPerEventTag.getEventTags();
+        boolean removed = eventTags.removeIf(eventTag -> eventTag.getEventTagNo().equals(eventTagNo));
+
+        if (!removed) {
+            throw new EntityNotFoundException("EventTag not found");
+        }
+
+        accountPerEventTag.setEventTags(eventTags);
+        accountPerEventTagRepository.save(accountPerEventTag);
+    }
 
     public EventTagDto createEventTagAndUpdateUser(String eventTag, Long accountId) {
         EventTag newEventTag = createEventTag(eventTag);
