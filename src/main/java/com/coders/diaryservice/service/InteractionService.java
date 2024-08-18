@@ -55,7 +55,7 @@ public class InteractionService {
         Date startDate = Date.from(startDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         if (diaryRepository.countDiariesAfterDate(startDate, accountId) == 0) {
-            List<Interactions> filteredInteractions = interactions.stream().filter(interaction -> interaction.getKeyword().equals("일기권유"))
+            List<Interactions> filteredInteractions = interactions.stream().filter(interaction -> interaction.getKeyword().contains("권유"))
                     .toList();
             int randomIndex = ThreadLocalRandom.current().nextInt(filteredInteractions.size());
             return filteredInteractions.get(randomIndex);

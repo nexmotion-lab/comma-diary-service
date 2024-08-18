@@ -21,8 +21,8 @@ public class InteractionController {
 
     @PostMapping()
     private ResponseEntity<Void> addInteraction(@RequestParam String keyword,
-                                         @RequestParam List<String> texts,
-                                         @RequestParam MultipartFile image) throws IOException {
+                                         @RequestPart("texts") List<String> texts,
+                                         @RequestPart("image") MultipartFile image) throws IOException {
         interactionService.insertInteraction(keyword, texts, image.getBytes());
         return ResponseEntity.ok().build();
     }
