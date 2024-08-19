@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class DiaryPerEventTag implements Persistable<DiaryPerEventTagId> {
+public class DiaryPerEventTag {
 
     @EmbeddedId
     private DiaryPerEventTagId id;
@@ -30,19 +30,4 @@ public class DiaryPerEventTag implements Persistable<DiaryPerEventTagId> {
     @JoinColumn(name = "event_tag_no")
     private EventTag eventTag;
 
-    @CreatedDate
-    @Transient
-    private LocalDate created;
-
-
-
-    @Override
-    public DiaryPerEventTagId getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isNew() {
-        return created == null;
-    }
 }

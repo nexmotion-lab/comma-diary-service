@@ -2,6 +2,7 @@ package com.coders.diaryservice.controller;
 
 import com.coders.diaryservice.dto.DiaryDto;
 import com.coders.diaryservice.dto.DiaryRequest;
+import com.coders.diaryservice.dto.EmotionTagDto;
 import com.coders.diaryservice.dto.EventTagDto;
 import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.Diary;
@@ -58,7 +59,29 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("")
+    @PatchMapping("/emotionTag")
+    public ResponseEntity<Void> updateEmotionTags(@RequestHeader("X-User-Id") Long accountId,
+                                                                 @RequestParam List<Long> emotionTagNo,
+                                                                 @RequestParam Long diaryNo) {
+        diaryService.updateDiaryPerEmotionTag(accountId, diaryNo, emotionTagNo);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/eventTag")
+    public ResponseEntity<Void> updateEventTags(@RequestHeader("X-User-Id") Long accountId,
+                                                  @RequestParam List<Long> eventTagNo,
+                                                  @RequestParam Long diaryNo) {
+        diaryService.updateDiaryPerEventTag(accountId, diaryNo, eventTagNo);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/content")
+    public ResponseEntity<Void> updateDiaryContent(@RequestHeader("X-User-Id") Long accountId,
+                                                @RequestParam String content,
+                                                @RequestParam Long diaryNo) {
+        diaryService.updateDiaryContent(diaryNo, accountId, content);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("/eventTag")
     public ResponseEntity<EventTagDto> createEventTags(@RequestParam String eventTagName, HttpServletRequest request) {

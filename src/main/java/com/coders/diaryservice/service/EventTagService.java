@@ -46,6 +46,7 @@ public class EventTagService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Transactional
     public void deleteAccountPerEventTag(Long eventTagNo, Long accountId) {
         Long count = diaryRepository.countByAccountIdAndEventTagNo(accountId, eventTagNo);
         if (count > 0) {

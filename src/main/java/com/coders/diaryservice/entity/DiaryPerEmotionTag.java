@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @EntityListeners(AuditingEntityListener.class)
 @AllArgsConstructor
 @Builder
-public class DiaryPerEmotionTag implements Persistable<DiaryPerEmotionTagId> {
+public class DiaryPerEmotionTag {
 
     @EmbeddedId
     private DiaryPerEmotionTagId id;
@@ -32,19 +32,6 @@ public class DiaryPerEmotionTag implements Persistable<DiaryPerEmotionTagId> {
     @JoinColumn(name = "emotion_tag_no")
     private EmotionTag emotionTag;
 
-    @CreatedDate
-    @Transient
-    private LocalDate created;
 
 
-
-    @Override
-    public DiaryPerEmotionTagId getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isNew() {
-        return created == null;
-    }
 }
