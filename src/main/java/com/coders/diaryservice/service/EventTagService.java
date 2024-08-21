@@ -5,11 +5,13 @@ import com.coders.diaryservice.dto.mapper.DiaryMapper;
 import com.coders.diaryservice.entity.AccountPerEventTag;
 import com.coders.diaryservice.entity.EmotionTag;
 import com.coders.diaryservice.entity.EventTag;
+import com.coders.diaryservice.entity.EventTagWeight;
 import com.coders.diaryservice.exception.eventTag.CannotDeleteEventTagException;
 import com.coders.diaryservice.exception.eventTag.DuplicateEventTagUpdateException;
 import com.coders.diaryservice.repository.AccountPerEventTagRepository;
 import com.coders.diaryservice.repository.DiaryRepository;
 import com.coders.diaryservice.repository.EventTagRepository;
+import com.coders.diaryservice.repository.EventTagWeightRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -33,6 +35,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -42,9 +45,39 @@ public class EventTagService {
     private final EventTagRepository eventTagRepository;
     private final AccountPerEventTagRepository accountPerEventTagRepository;
     private final DiaryRepository diaryRepository;
+    private final EventTagWeightRepository eventTagWeightRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Transactional
+    public List<EventTagDto> getFilteredEventTag(String searchQuery, Long accountId) {
+
+        AccountPerEventTag accountPerEventTag = accountPerEventTagRepository.findByAccountId(accountId).orElseThrow();
+        List<EventTag> accountEventTagList = accountPerEventTag.getEventTags().stream().filter(eventTag -> eventTag.getName().contains(searchQuery))
+                .toList();
+
+        if (accountEventTagList.size() >= 5) {
+            return accountEventTagList.subList(0, 5).stream().map(DiaryMapper::toEventTagDto).toList();
+        } else {
+            List<EventTagDto> result = accountEventTagList.stream()
+                    .map(DiaryMapper::toEventTagDto)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            int remainingSlots = 5 - accountEventTagList.size();
+
+            List<EventTagWeight> eventTagWeights = eventTagWeightRepository.searchByKeyword(searchQuery, remainingSlots);
+
+            eventTagWeights.stream()
+                    .filter(weight -> accountEventTagList.stream()
+                            .noneMatch(tag -> tag.getEventTagNo().equals(weight.getId().getEventTagNo())))
+                    .map(DiaryMapper::toEventTagDto)
+                    .forEach(result::add);
+
+            return result.subList(0, Math.min(5, result.size()));
+        }
+
+    }
 
     @Transactional
     public void deleteAccountPerEventTag(Long eventTagNo, Long accountId) {

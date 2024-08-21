@@ -64,4 +64,14 @@ public class DiaryMapper {
 
         return dto;
     }
+
+    public static EventTagDto toEventTagDto(EventTagWeight eventTagWeight) {
+        if (eventTagWeight == null) return null;
+
+        EventTagDto dto = new EventTagDto();
+        dto.setEventTagNo(eventTagWeight.getId().getEventTagNo());
+        dto.setName(eventTagWeight.getId().getWord());
+
+        return dto;
+    }
 }

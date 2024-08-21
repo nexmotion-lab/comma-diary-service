@@ -39,6 +39,13 @@ public class DiaryController {
 
     private final EventTagService eventTagService;
 
+    @GetMapping("/eventTag/search")
+    public ResponseEntity<List<EventTagDto>> getAllEventTag(@RequestHeader("X-User-Id") Long accountId,
+                                                            @RequestParam String searchQuery) {
+        List<EventTagDto> filteredEventTag = eventTagService.getFilteredEventTag(searchQuery, accountId);
+
+        return ResponseEntity.ok(filteredEventTag);
+    }
 
     @PostMapping()
     public ResponseEntity<Void> createDiary(@RequestBody DiaryRequest diaryRequest, HttpServletRequest request) {
