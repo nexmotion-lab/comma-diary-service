@@ -1,34 +1,55 @@
+server:
+  port: 9003
+  shutdown: graceful
+  tomcat:
+    threads:
+      min-spare: 10
+      max: 200
+    accept-count: 100
+    connection-timeout: 2s
+    keep-alive-timeout: 2s
+
 spring:
   application:
     name: diary-service
-  profiles:
-    active: test
-  config:
-    import: "configserver:http://config-server:8087"
-  cloud:
-    config:
-      fail-fast: true
-      retry:
-        initial-interval: 10000
-        max-attempts: 5
-        multiplier: 1.5
-      request-read-timeout: 10000
-      request-connect-timeout: 2000
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  datasource:
+    username: root
+    password: temaris780525
+    url: jdbc:mysql://localhost:3306/comma_diary?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bindings, configprops, env, flyway, functions, health, heapdump, info, loggers, mappings, prometheus
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
 
 
 
-springdoc:
-  api-docs:
-    path: /api-docs
-    groups.enabled: true
-  swagger-ui:
-    path: /swagger-ui-custom.html
-    enabled: true
-    groups-order: ASC
-    tags-sorter: alpha
-    operations-sorter: alpha
-    display-request-duration: true
-    doc-expansion: none
-  cache:
-    disabled: true
-  model-and-view-allowed: true

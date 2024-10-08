@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    url: jdbc:mysql://comma-mysql-diary:7002/comma_diary?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+
