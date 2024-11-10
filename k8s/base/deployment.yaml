@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         app: diary-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "9003"
     spec:
       containers:
         - name: diary-service
@@ -27,6 +31,21 @@ spec:
           env:
             - name: SPRING_CONFIG_ADDITIONAL_LOCATION
               value: "file:/config/"
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
@@ -40,8 +59,7 @@ spec:
               path: /actuator/health/readiness
               port: 9003
             initialDelaySeconds: 20
-            periodSeconds: 10
-
+            periodSeconds: 15
           volumeMounts:
             - name: diary-config-volume
               mountPath: /config

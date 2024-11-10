@@ -12,4 +12,4 @@ configMapGenerator:
   - behavior: merge
     files:
       - application-prod.yml
-    name: auth-config
+    name: diary-config
